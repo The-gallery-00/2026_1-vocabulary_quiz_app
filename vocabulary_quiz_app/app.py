@@ -5,7 +5,7 @@ import tkinter as tk
 
 from tkinter import ttk, font
 
-from vocabulary_quiz_app.quiz_logic import Word, check_answer, draw_word
+from vocabulary_quiz_app.quiz_logic import Word, check_answer, draw_word, format_meanings
 
 
 class VocabularyQuizApp:
@@ -21,11 +21,12 @@ class VocabularyQuizApp:
         self.default_font.configure(family="NanumGothic", size=12)
 
         root.title("Vocabulary Quiz")
-        root.geometry("420x280")
+        root.geometry("420x320")
         root.resizable(False, False)
 
         self.word_var = tk.StringVar(value="단어를 불러오는 중...")
         self.feedback_var = tk.StringVar(value="")
+        self.answer_info_var = tk.StringVar(value="")
         self.score_var = tk.StringVar(value="Score: 0/0")
 
         ttk.Label(root, text="영단어").pack(pady=(16, 4))
@@ -43,6 +44,7 @@ class VocabularyQuizApp:
         )
 
         ttk.Label(root, textvariable=self.feedback_var).pack(pady=8)
+        ttk.Label(root, textvariable=self.answer_info_var).pack()
         ttk.Label(root, textvariable=self.score_var).pack()
 
         self.next_word()
@@ -52,6 +54,11 @@ class VocabularyQuizApp:
         self.word_var.set(self.current.term)
         self.answer_entry.delete(0, tk.END)
         self.feedback_var.set("")
+        extra_count = len(self.current.accepted_meanings)
+        if extra_count:
+            self.answer_info_var.set(f"허용되는 추가 정답: {extra_count}개")
+        else:
+            self.answer_info_var.set("기본 정답 1개")
         self.checked = False
         self.check_button.state(["!disabled"])
         self.answer_entry.focus()
@@ -66,6 +73,7 @@ class VocabularyQuizApp:
             self.score += 1
             self.feedback_var.set("정답입니다!")
         else:
-            self.feedback_var.set(f"오답입니다. 정답: {self.current.meaning}")
+            self.feedback_var.set(f"오답입니다. 정답: {format_meanings(self.current)}")
+        self.answer_info_var.set(f"허용 정답: {format_meanings(self.current)}")
         self.score_var.set(f"Score: {self.score}/{self.total}")
         self.check_button.state(["disabled"])
