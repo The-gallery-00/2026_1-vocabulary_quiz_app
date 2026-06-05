@@ -1,6 +1,6 @@
 import random
 
-from vocabulary_quiz_app.quiz_logic import Word, check_answer, draw_word
+from vocabulary_quiz_app.quiz_logic import Word, check_answer, draw_word, format_meanings
 
 
 def test_check_answer_normalized() -> None:
@@ -8,6 +8,20 @@ def test_check_answer_normalized() -> None:
     assert check_answer(word, "사과")
     assert check_answer(word, "  사과 ")
     assert not check_answer(word, "apple")
+
+
+def test_check_answer_accepts_additional_meanings() -> None:
+    word = Word(term="chair", meaning="의자", accepted_meanings=("좌석", "자리"))
+
+    assert check_answer(word, "좌석")
+    assert check_answer(word, " 자리 ")
+    assert not check_answer(word, "책상")
+
+
+def test_format_meanings_includes_primary_and_additional_meanings() -> None:
+    word = Word(term="summer", meaning="여름", accepted_meanings=("하계",))
+
+    assert format_meanings(word) == "여름, 하계"
 
 
 def test_draw_word_uses_rng_choice() -> None:

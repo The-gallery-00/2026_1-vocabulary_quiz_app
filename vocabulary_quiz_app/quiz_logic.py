@@ -9,6 +9,10 @@ from dataclasses import dataclass
 class Word:
     term: str
     meaning: str
+    accepted_meanings: tuple[str, ...] = ()
+
+    def all_meanings(self) -> tuple[str, ...]:
+        return (self.meaning, *self.accepted_meanings)
 
 
 def normalize_answer(text: str) -> str:
@@ -16,7 +20,15 @@ def normalize_answer(text: str) -> str:
 
 
 def check_answer(word: Word, user_input: str) -> bool:
-    return normalize_answer(user_input) == normalize_answer(word.meaning)
+    normalized_input = normalize_answer(user_input)
+    return any(
+        normalized_input == normalize_answer(meaning)
+        for meaning in word.all_meanings()
+    )
+
+
+def format_meanings(word: Word) -> str:
+    return ", ".join(word.all_meanings())
 
 
 def draw_word(words: list[Word], rng: random.Random | None = None) -> Word:
