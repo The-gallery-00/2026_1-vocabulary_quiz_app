@@ -2,7 +2,16 @@ from __future__ import annotations
 
 import random
 
+from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Protocol, TypeVar
+
+T = TypeVar("T")
+
+
+class RandomChooser(Protocol):
+    def choice(self, seq: Sequence[T]) -> T:
+        ...
 
 
 @dataclass(frozen=True)
@@ -31,8 +40,8 @@ def format_meanings(word: Word) -> str:
     return ", ".join(word.all_meanings())
 
 
-def draw_word(words: list[Word], rng: random.Random | None = None) -> Word:
+def draw_word(words: list[Word], rng: RandomChooser | None = None) -> Word:
     if not words:
         raise ValueError("Word list is empty")
-    chooser = rng if rng is not None else random
+    chooser: RandomChooser = rng if rng is not None else random
     return chooser.choice(words)

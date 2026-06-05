@@ -1,6 +1,11 @@
 import random
 
+from collections.abc import Sequence
+from typing import TypeVar
+
 from vocabulary_quiz_app.quiz_logic import Word, check_answer, draw_word, format_meanings
+
+T = TypeVar("T")
 
 
 def test_check_answer_normalized() -> None:
@@ -28,7 +33,7 @@ def test_draw_word_uses_rng_choice() -> None:
     words = [Word(term="a", meaning="A"), Word(term="b", meaning="B")]
 
     class FixedRng:
-        def choice(self, seq):
+        def choice(self, seq: Sequence[T]) -> T:
             return seq[0]
 
     assert draw_word(words, FixedRng()) == words[0]
